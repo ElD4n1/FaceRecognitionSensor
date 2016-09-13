@@ -45,3 +45,12 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Project related files and dirs
+__pycache__
+training/images/positives
+training/model_fisherfaces.xml
+training/training.csv
+persons.ini
+test.py
+*.pyc
