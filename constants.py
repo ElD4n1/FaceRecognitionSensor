@@ -7,4 +7,4 @@ MODEL_FILE = 'training/model_fisherfaces.xml'
 FACE_WIDTH = 100
 FACE_HEIGHT = 100
 
-ROOM_NUMBER = 3
+IDENTIFIER = 'raspicamera'
