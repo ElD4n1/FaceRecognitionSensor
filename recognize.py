@@ -19,9 +19,15 @@ class Recognizer:
 		print('training data loaded!')
 		print('connecting to tracker web service')
 		# connect to the indoor person tracker web service
+		self.isConnected = False
 		self.tracker = IndoorPersonTrackerAPI()
-		self.tracker.register(constants.IDENTIFIER)
-		print('connection is up!')
+		success = self.tracker.register(constants.IDENTIFIER)
+		if success:
+			print('connection is up!')
+			self.isConnected = True
+		else:
+			print('connection failed!')
+			self.isConnected = False
 
 	def recognize(self):
 		# take the current frame of the video stream for recognition
@@ -36,4 +42,5 @@ class Recognizer:
 			label, confidence = self.model.predict(cropped)
 			if label > 0 and confidence <= 800:
 				print("Hello {}! Confidence: {}".format(self.persons[str(label)]["name"], confidence))
-				self.tracker.updateIdentification(constants.IDENTIFIER, self.persons[str(label)]["name"], 0.0) # TODO calculate small probFalseDetection as a function from confidence
+				if self.isConnected:
+					self.tracker.updateIdentificationCustomPFD(constants.IDENTIFIER, self.persons[str(label)]["name"], 0.0) # TODO calculate small probFalseDetection as a function from confidence
