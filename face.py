@@ -13,7 +13,7 @@ def detect_faces(image):
 class FaceVideoStreamFrame(threading.Thread):
 	def __init__(self):
 		threading.Thread.__init__(self)
-		self.vs = VideoStream(usePiCamera=True, resolution=(1920, 1080))
+		self.vs = VideoStream(usePiCamera=True, resolution=(3240, 2464))
 		self.isRunning = False
 		
 	def run(self):
