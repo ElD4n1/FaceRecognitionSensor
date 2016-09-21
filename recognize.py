@@ -10,6 +10,7 @@ import threading
 
 class Recognizer(threading.Thread):
 	def __init__(self):
+		threading.Thread(self).__init__()
 		self.video_frame = FaceVideoStreamFrame()
 		#self.video_frame.start()
 		print('loading training data...')
