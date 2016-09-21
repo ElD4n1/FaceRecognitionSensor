@@ -1,8 +1,9 @@
 import cv2
 import threading
 #from imutils.video import VideoStream
-import picamera
-import picamera.array
+#import picamera
+#import picamera.array
+import v412capture
 import imutils
 import time
 
@@ -17,13 +18,18 @@ class FaceVideoStreamFrame(threading.Thread):
 		threading.Thread.__init__(self)
 		#self.vs = VideoStream(usePiCamera=True, resolution=(3240, 2464))
 		self.isRunning = False
-		self.camera = picamera.PiCamera()
-		self.camera.resolution = (1920, 1080)
-		self.stream = picamera.array.PiRGBArray(self.camera)
+		#self.camera = picamera.PiCamera()
+		#self.camera.resolution = (1920, 1080)
+		#self.stream = picamera.array.PiRGBArray(self.camera)
+		self.video = v4l2capture.Video_device("/dev/video0")
+		self.video.set_format(1920, 1080, fourcc='MJPG')
+		self.video.create_buffers(30)
+		self.video.queue_all_buffers()
 		
 	def run(self):
 		# initialize the video stream and allow the cammera sensor to warmup
 		#self.vs.start()
+		self.video.start()
 		time.sleep(2.0)
 		self.isRunning = True
 		# loop over the frames from the video stream
@@ -33,8 +39,11 @@ class FaceVideoStreamFrame(threading.Thread):
 			#frame = self.vs.read()
 			#frame = imutils.resize(frame, width=400)
 			
-			self.camera.capture(self.stream, 'bgr', use_video_port=True)
-			frame = self.stream.array
+			#self.camera.capture(self.stream, 'bgr', use_video_port=True)
+			#frame = self.stream.array
+			
+			frame = video.read_and_queue()
+			self.currentFrame = frame
 			
 			gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -48,7 +57,7 @@ class FaceVideoStreamFrame(threading.Thread):
 			# show the frame
 			cv2.imshow("Frame", frame)
 			
-			self.stream.truncate(0) #Must use this to eliminate the error: "Incorrect buffer length"
+			#self.stream.truncate(0) #Must use this to eliminate the error: "Incorrect buffer length"
 			
 			key = cv2.waitKey(10) & 0xFF
 		cv2.destroyAllWindows()
@@ -56,6 +65,7 @@ class FaceVideoStreamFrame(threading.Thread):
 	def stop(self):
 		self.isRunning = False
 		#self.vs.stop()
+		self.video.close()
 		print("VideoStream stopped, all resources freed")
 
 	def getCurrentFrame(self):
@@ -63,4 +73,6 @@ class FaceVideoStreamFrame(threading.Thread):
 			time.sleep(2.1)
 		if(self.isRunning):
 			#return self.vs.read()
-			return self.stream.array
+			#return self.stream.array
+			return self.currentFrame
+			
