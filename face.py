@@ -3,7 +3,7 @@ import threading
 #from imutils.video import VideoStream
 #import picamera
 #import picamera.array
-import v412capture
+import v4l2capture
 import imutils
 import time
 
@@ -22,7 +22,7 @@ class FaceVideoStreamFrame(threading.Thread):
 		#self.camera.resolution = (1920, 1080)
 		#self.stream = picamera.array.PiRGBArray(self.camera)
 		self.video = v4l2capture.Video_device("/dev/video0")
-		self.video.set_format(1920, 1080, fourcc='MJPG')
+		self.video.set_format(1920, 1088, fourcc='BGR3')
 		self.video.create_buffers(30)
 		self.video.queue_all_buffers()
 		
