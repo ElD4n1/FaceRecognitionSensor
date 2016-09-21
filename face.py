@@ -25,6 +25,7 @@ class FaceVideoStreamFrame(threading.Thread):
 		time.sleep(2.0)
 		self.isRunning = True
 		# loop over the frames from the video stream
+		key = ord("o")
 		while key != ord('c'):
 			# grab the frame from the threaded video stream and resize it
 			# to have a maximum width of 400 pixels
@@ -66,7 +67,7 @@ class FaceVideoStreamFrame(threading.Thread):
 			return self.currentFrame
 			
 class FaceRectangles(threading.Thread):
-	def __init__:
+	def __init__(self):
 		self.haar_cascade = cv2.CascadeClassifier()
 		self.haar_cascade.load('haarcascade_frontalface_default.xml')
 		self.gray = np.array([])
