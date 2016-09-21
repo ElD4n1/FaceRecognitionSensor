@@ -17,10 +17,9 @@ class FaceVideoStreamFrame(threading.Thread):
 		threading.Thread.__init__(self)
 		#self.vs = VideoStream(usePiCamera=True, resolution=(3240, 2464))
 		self.isRunning = False
-		self.currentFrame = stream.array
 		self.camera = picamera.PiCamera()
-		self.camera.resolution = (3240, 2464)
-		self.stream = picamera.array.PiRGBArray(camera)
+		self.camera.resolution = (1920, 1080)
+		self.stream = picamera.array.PiRGBArray(self.camera)
 		
 	def run(self):
 		# initialize the video stream and allow the cammera sensor to warmup
@@ -34,9 +33,8 @@ class FaceVideoStreamFrame(threading.Thread):
 			#frame = self.vs.read()
 			#frame = imutils.resize(frame, width=400)
 			
-			self.camera.capture(stream, 'bgr', use_video_port=True)
+			self.camera.capture(self.stream, 'bgr', use_video_port=True)
 			frame = self.stream.array
-			self.currentFrame = frame
 			
 			gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -46,6 +44,7 @@ class FaceVideoStreamFrame(threading.Thread):
 			for (x, y, w, h) in faces:
 				cv2.rectangle(frame, (x,y), (x+w, y+h), (255,0,0), 2)
 
+			frame = imutils.resize(frame, width=400)
 			# show the frame
 			cv2.imshow("Frame", frame)
 			
@@ -64,4 +63,4 @@ class FaceVideoStreamFrame(threading.Thread):
 			time.sleep(2.1)
 		if(self.isRunning):
 			#return self.vs.read()
-			return self.currentFrame
+			return self.stream.array
