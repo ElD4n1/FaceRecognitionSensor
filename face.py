@@ -46,7 +46,7 @@ class FaceVideoStreamFrame(threading.Thread):
 			
 			#self.stream.truncate(0) #Must use this to eliminate the error: "Incorrect buffer length"
 			
-			key = cv2.waitKey(10) & 0xFF
+			key = cv2.waitKey(1) & 0xFF
 		cv2.destroyAllWindows()
 
 	def stop(self):
