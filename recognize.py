@@ -11,7 +11,7 @@ import threading
 class Recognizer(threading.Thread):
 	def __init__(self):
 		self.video_frame = FaceVideoStreamFrame()
-		#self.video_frame.start()
+		self.video_frame.start()
 		print('loading training data...')
 		self.model = cv2.face.createFisherFaceRecognizer()
 		self.model.load(constants.MODEL_FILE)
@@ -22,7 +22,7 @@ class Recognizer(threading.Thread):
 		# connect to the indoor person tracker web service
 		#self.isConnected = False
 		#self.tracker = IndoorPersonTrackerAPI()
-		success = self.tracker.register(constants.IDENTIFIER)
+		#success = self.tracker.register(constants.IDENTIFIER)
 		#if success:
 		#	print('connection is up!')
 		#	self.isConnected = True
@@ -48,7 +48,7 @@ class Recognizer(threading.Thread):
 				print("Hello {}! Confidence: {}".format(self.persons[str(label)]["name"], confidence))
 				#if self.isConnected:
 					#self.tracker.updateIdentificationCustomPFD(constants.IDENTIFIER, self.persons[str(label)]["name"], 0.0) # TODO calculate small probFalseDetection as a function from confidence
-					self.recognized.append(self.persons[str(label)]["name"])
+				self.recognized.append(self.persons[str(label)]["name"])
 					
 	def getRecognized(self):
 		return self.recognized
