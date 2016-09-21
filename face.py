@@ -74,9 +74,10 @@ class FaceRectangles(threading.Thread):
 		self.lock = threading.Lock()	
 		
 	def run(self):
-		self.lock.acquire()
-		self.faces = detect_faces(self.gray)
-		self.lock.release()
+		while True:
+			self.lock.acquire()
+			self.faces = detect_faces(self.gray)
+			self.lock.release()
 		
 	def getFaces(self):
 		self.lock.acquire()
