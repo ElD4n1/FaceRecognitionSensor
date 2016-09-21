@@ -6,6 +6,7 @@ import threading
 import v4l2capture
 import imutils
 import time
+import numpy as np
 
 def detect_faces(image):
 	haar_cascade = cv2.CascadeClassifier()
@@ -25,7 +26,8 @@ class FaceVideoStreamFrame(threading.Thread):
 		self.video.set_format(1920, 1088, fourcc='BGR3')
 		self.video.create_buffers(30)
 		self.video.queue_all_buffers()
-		
+		self.lock = threading.Lock()
+
 	def run(self):
 		# initialize the video stream and allow the cammera sensor to warmup
 		#self.vs.start()
@@ -42,9 +44,12 @@ class FaceVideoStreamFrame(threading.Thread):
 			#self.camera.capture(self.stream, 'bgr', use_video_port=True)
 			#frame = self.stream.array
 			
-			frame = video.read_and_queue()
+			self.lock.acquire()
+			frame = self.video.read_and_queue()
+			frame = np.array(frame)
 			self.currentFrame = frame
-			
+			self.lock.release()
+
 			gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 			faces = detect_faces(gray)
@@ -74,5 +79,8 @@ class FaceVideoStreamFrame(threading.Thread):
 		if(self.isRunning):
 			#return self.vs.read()
 			#return self.stream.array
+			self.lock.acquire()
+			result = np.array(self.currentFrame)
+			self.lock.release()
 			return self.currentFrame
 			

@@ -4,6 +4,7 @@ import cv2
 import constants
 import capture
 import train
+import time
 from recognize import Recognizer
 
 class SensorShell(cmd.Cmd):
@@ -27,6 +28,7 @@ class SensorShell(cmd.Cmd):
 		print("starting recognize loop, press 'C' to cancel")
 		recognizer = Recognizer()
 		key = 0
+		time.sleep(2.0)
 		while key != 'c' and key != 'C':
 			recognizer.recognize()
 			key = cv2.waitKey(100)
