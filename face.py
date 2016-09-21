@@ -1,8 +1,5 @@
 import cv2
 import threading
-#from imutils.video import VideoStream
-#import picamera
-#import picamera.array
 import v4l2capture
 import imutils
 import time
@@ -17,36 +14,21 @@ def detect_faces(image):
 class FaceVideoStreamFrame(threading.Thread):
 	def __init__(self):
 		threading.Thread.__init__(self)
-		#self.vs = VideoStream(usePiCamera=True, resolution=(3240, 2464))
 		self.isRunning = False
-		#self.camera = picamera.PiCamera()
-		#self.camera.resolution = (1920, 1080)
-		#self.stream = picamera.array.PiRGBArray(self.camera)
-		self.video = v4l2capture.Video_device("/dev/video0")
-		self.video.set_format(1920, 1088, fourcc='BGR3')
-		self.video.create_buffers(30)
-		self.video.queue_all_buffers()
+		video = "/dev/video0"
+		self.video_capture = cv2.VideoCapture(video)
 		self.lock = threading.Lock()
 
 	def run(self):
 		# initialize the video stream and allow the cammera sensor to warmup
-		#self.vs.start()
-		self.video.start()
 		time.sleep(2.0)
 		self.isRunning = True
 		# loop over the frames from the video stream
 		while self.isRunning:
 			# grab the frame from the threaded video stream and resize it
 			# to have a maximum width of 400 pixels
-			#frame = self.vs.read()
-			#frame = imutils.resize(frame, width=400)
-			
-			#self.camera.capture(self.stream, 'bgr', use_video_port=True)
-			#frame = self.stream.array
-			
 			self.lock.acquire()
-			frame = self.video.read_and_queue()
-			frame = np.array(frame)
+			ret, frame = self.video_capture.read()
 			self.currentFrame = frame
 			self.lock.release()
 
@@ -69,8 +51,7 @@ class FaceVideoStreamFrame(threading.Thread):
 
 	def stop(self):
 		self.isRunning = False
-		#self.vs.stop()
-		self.video.close()
+		self.video_capture.release()
 		print("VideoStream stopped, all resources freed")
 
 	def getCurrentFrame(self):
