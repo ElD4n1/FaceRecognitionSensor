@@ -3,16 +3,16 @@ import numpy as np
 from configparser import ConfigParser
 
 import constants
-import face
-from face import FaceVideoStreamFrame
+#import face
+#from face import FaceVideoStreamFrame
 #from indoorpersontrackerapi import IndoorPersonTrackerAPI
 import threading
 
 class Recognizer(threading.Thread):
 	def __init__(self):
-		threading.Thread(self).__init__()
-		self.video_frame = FaceVideoStreamFrame()
-		self.video_frame.start()
+		threading.Thread.__init__(self)
+		#self.video_frame = FaceVideoStreamFrame()
+		#self.video_frame.start()
 		print('loading training data...')
 		self.model = cv2.face.createFisherFaceRecognizer()
 		self.model.load(constants.MODEL_FILE)
@@ -31,25 +31,44 @@ class Recognizer(threading.Thread):
 		#	print('connection failed!')
 		#	self.isConnected = False
 		self.lock = threading.Lock()
+		#self.begin_lock = threading.Lock()
 		self.recognized = []
+		self.grayscale = np.array([])
+		self.faces = []
 		
 	def run(self):
 		# take the current frame of the video stream for recognition
-		image = self.video_frame.getCurrentFrame()
+		#image = self.video_frame.getCurrentFrame()
 		# convert image to grayscale
-		grayscale = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+		#grayscale = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 		# get coordinates of all faces in image
 		
-		faces = face.detect_faces(grayscale)
-		for f in faces:
+		#faces = face.detect_faces(self.grayscale)
+		#self.begin_lock.acquire()
+		self.lock.acquire()
+		print("predicting {} faces...".format(len(self.faces)))
+		for f in self.faces:
 			x, y, w, h = f
-			cropped = cv2.resize(grayscale[y:y+h, x:x+w], (constants.FACE_WIDTH, constants.FACE_HEIGHT))
+			cropped = cv2.resize(self.grayscale[y:y+h, x:x+w], (constants.FACE_WIDTH, constants.FACE_HEIGHT))
 			label, confidence = self.model.predict(cropped)
 			if label > 0 and confidence <= 800:
 				print("Hello {}! Confidence: {}".format(self.persons[str(label)]["name"], confidence))
 				#if self.isConnected:
 					#self.tracker.updateIdentificationCustomPFD(constants.IDENTIFIER, self.persons[str(label)]["name"], 0.0) # TODO calculate small probFalseDetection as a function from confidence
 				self.recognized.append(self.persons[str(label)]["name"])
+		self.lock.release()
 					
 	def getRecognized(self):
-		return self.recognized
+		#self.lock.acquire()
+		result = self.recognized
+		#if self.begin_lock.locked():
+		#	self.begin_lock.release()
+		#self.lock.release()
+		return result
+		
+	def setData(self, frame, faces):
+		self.lock.acquire()
+		print("setting data...")
+		self.grayscale = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+		self.faces = faces
+		self.lock.release()

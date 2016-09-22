@@ -6,6 +6,8 @@ import capture
 import train
 import time
 from recognize import Recognizer
+from face import FaceVideoStreamFrame
+from face import FaceRectangles
 
 class SensorShell(cmd.Cmd):
 	intro = 'Hello, this is the sensor shell. Type ? or help to get a list of commands.\n'
@@ -26,12 +28,14 @@ class SensorShell(cmd.Cmd):
 	def do_recognize(self, arg):
 		'Syntax: recognize\nStart the recognize loop and try periodically to recongize all persons in the image'
 		print("starting recognize loop, press 'C' to cancel")
+		face_video_stream_frame = FaceVideoStreamFrame()
+		face_video_stream_frame.start()
 		recognizer = Recognizer()
-		time.sleep(1.0)
 		recognizer.start()
 		key = 0
 		time.sleep(2.0)
 		while key != 'c' and key != 'C':
+			recognizer.setData(face_video_stream_frame.getCurrentFrame(), face_video_stream_frame.getCurrentFaces())
 			recognizer.getRecognized()
 			key = cv2.waitKey(1)
 	

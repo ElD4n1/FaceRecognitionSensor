@@ -17,7 +17,7 @@ class FaceVideoStreamFrame(threading.Thread):
 		self.isRunning = False
 		video = "/dev/video0"
 		self.video_capture = cv2.VideoCapture(video)
-		self.lock = threading.Lock()
+		#self.lock = threading.Lock()
 		self.faces = FaceRectangles()
 
 	def run(self):
@@ -26,13 +26,13 @@ class FaceVideoStreamFrame(threading.Thread):
 		self.isRunning = True
 		# loop over the frames from the video stream
 		key = ord("o")
-		while key != ord('c'):
+		while key != ord('c') and self.isRunning:
 			# grab the frame from the threaded video stream and resize it
 			# to have a maximum width of 400 pixels
-			self.lock.acquire()
+			#self.lock.acquire()
 			ret, frame = self.video_capture.read()
 			self.currentFrame = frame
-			self.lock.release()
+			#self.lock.release()
 
 			gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 			
@@ -40,6 +40,7 @@ class FaceVideoStreamFrame(threading.Thread):
 			faces = self.faces.getFaces()
 
 			# Draw a rectangle around the faces
+			print("drawing rectangles around {} faces".format(len(faces)))
 			for (x, y, w, h) in faces:
 				cv2.rectangle(frame, (x,y), (x+w, y+h), (255,0,0), 2)
 
@@ -59,12 +60,13 @@ class FaceVideoStreamFrame(threading.Thread):
 		if(not self.isRunning):
 			time.sleep(2.1)
 		if(self.isRunning):
-			#return self.vs.read()
-			#return self.stream.array
-			self.lock.acquire()
+			#self.lock.acquire()
 			result = np.array(self.currentFrame)
-			self.lock.release()
+			#self.lock.release()
 			return self.currentFrame
+			
+	def getCurrentFaces(self):
+		return self.faces.getFaces()
 			
 class FaceRectangles(threading.Thread):
 	def __init__(self):
@@ -72,21 +74,23 @@ class FaceRectangles(threading.Thread):
 		self.haar_cascade.load('haarcascade_frontalface_default.xml')
 		self.gray = np.array([])
 		self.faces = []
-		self.lock = threading.Lock()	
+		#self.lock = threading.Lock()	
 		
 	def run(self):
 		while True:
-			self.lock.acquire()
+			#self.lock.acquire()
+			print("looking for faces...")
 			self.faces = detect_faces(self.gray)
-			self.lock.release()
+			print("detected %d faces".format(len(self.faces)))
+			#self.lock.release()
 		
 	def getFaces(self):
-		self.lock.acquire()
+		#self.lock.acquire()
 		result = self.faces # TODO clone array
-		self.lock.release()
+		#self.lock.release()
 		return result
 		
 	def setGray(self, gray):
-		self.lock.acquire()
+		#self.lock.acquire()
 		self.gray = gray
-		self.lock.release()
+		#self.lock.release()
