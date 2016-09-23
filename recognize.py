@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from configparser import ConfigParser
+import time
 
 import constants
 import face
@@ -31,11 +32,11 @@ class Recognizer:
 
 	def recognize(self):
 		# take the current frame of the video stream for recognition
-		image = self.video_frame.getCurrentFrame()
+		grayscale, faces = self.video_frame.getCurrentFrame()
 		# convert image to grayscale
-		grayscale = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+		#grayscale = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 		# get coordinates of all faces in image
-		faces = face.detect_faces(grayscale)
+		#faces = face.detect_faces(grayscale)
 		for f in faces:
 			x, y, w, h = f
 			cropped = cv2.resize(grayscale[y:y+h, x:x+w], (constants.FACE_WIDTH, constants.FACE_HEIGHT))
@@ -44,3 +45,4 @@ class Recognizer:
 				print("Hello {}! Confidence: {}".format(self.persons[str(label)]["name"], confidence))
 				if self.isConnected:
 					self.tracker.updateIdentificationCustomPFD(constants.IDENTIFIER, self.persons[str(label)]["name"], 0.0) # TODO calculate small probFalseDetection as a function from confidence
+				time.sleep(1.0) # not trigger too often

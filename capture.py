@@ -47,11 +47,11 @@ def capture(name):
 		# Check if button was pressed or 'c' was received, then capture image.
 		input("press enter to capture your face, remaining captures: {}".format(10 - count))
 		print('capturing image...')
-		image = video_frame.getCurrentFrame()
+		image, faces = video_frame.getCurrentFrame()
 		# Convert image to grayscale.
-		image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+		#image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 		# Get coordinates of single face in captured image.
-		faces = face.detect_faces(image)
+		#faces = face.detect_faces(image)
 		if len(faces) == 1:
 			print("detected single face, processing it for training")
 			x, y, w, h = faces[0]

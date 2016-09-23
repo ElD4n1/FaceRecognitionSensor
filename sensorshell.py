@@ -31,7 +31,7 @@ class SensorShell(cmd.Cmd):
 		time.sleep(2.0)
 		while key != 'c' and key != 'C':
 			recognizer.recognize()
-			key = cv2.waitKey(100)
+			key = cv2.waitKey(1)
 	
 	def do_exit(self, arg):
 		'Exits the shell'
